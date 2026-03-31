@@ -35,4 +35,4 @@ export interface ReviewToken {
 
 export type PracticeDataSource = "remote" | "unavailable";
 
-export type PracticeMode = "normal" | "daily-challenge";
+export type PracticeMode = "normal" | "daily-challenge" | "word-training";

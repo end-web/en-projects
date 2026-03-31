@@ -194,7 +194,11 @@ export const usePracticeStore = defineStore("practice", () => {
   );
 
   const activeQuestions = computed(() =>
-    mode.value === "daily-challenge" ? dailyChallengeQuestions.value : filteredQuestions.value
+    mode.value === "daily-challenge"
+      ? dailyChallengeQuestions.value
+      : mode.value === "word-training"
+        ? []
+        : filteredQuestions.value
   );
 
   const currentQuestion = computed<Question | null>(() => {
@@ -299,11 +303,15 @@ export const usePracticeStore = defineStore("practice", () => {
 
   function setCourse(value: number): void {
     selectedCourse.value = value;
-    if (mode.value === "daily-challenge") {
+    if (mode.value === "daily-challenge" || mode.value === "word-training") {
       mode.value = "normal";
       dailyChallengeDone.value = false;
       dailyChallengeIndex.value = 0;
     }
+  }
+
+  function setMode(value: PracticeMode): void {
+    mode.value = value;
   }
 
   function updateWord(index: number, value: string): void {
@@ -476,6 +484,7 @@ export const usePracticeStore = defineStore("practice", () => {
     dailyChallengeIndex,
     dailyChallengeDone,
     setCourse,
+    setMode,
     updateWord,
     revealAnswer,
     nextQuestion,

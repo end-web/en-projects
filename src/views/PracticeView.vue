@@ -12,6 +12,7 @@ const store = usePracticeStore();
 
 const disabledAction = computed(() => !store.currentQuestion);
 const isChallengeMode = computed(() => store.mode === "daily-challenge");
+const isWordTrainingMode = computed(() => store.mode === "word-training");
 const expectedWords = computed(() =>
   store.currentQuestion?.en.replace(/[.,!?;:]+$/g, "").split(/\s+/).filter(Boolean) ?? []
 );
@@ -36,6 +37,18 @@ const fallbackQuotes = [
   { en: "Learning never stops", zh: "学习永不止步", audio: "" }
 ];
 const fallbackCursor = ref(0);
+const wordTrainingLoading = ref(false);
+const wordTrainingWord = ref("");
+const wordTrainingDefinition = ref("");
+const wordTrainingPhonetic = ref("");
+const wordTrainingInput = ref("");
+const wordTrainingFeedback = ref<"success" | "error" | null>(null);
+const wordTrainingStats = ref({ total: 0, correct: 0 });
+let wordPool: string[] | null = null;
+const WORD_POOL_ENDPOINTS = [
+  "https://fastly.jsdelivr.net/gh/first20hours/google-10000-english@master/20k.txt",
+  "https://cdn.jsdelivr.net/gh/first20hours/google-10000-english@master/20k.txt"
+];
 
 const glossMap: Record<string, string> = {
   i: "我",
@@ -289,6 +302,98 @@ function handleRead(): void {
   utter.pitch = 1;
 }
 
+async function ensureWordPool(): Promise<string[]> {
+  if (wordPool?.length) {
+    return wordPool;
+  }
+  for (const endpoint of WORD_POOL_ENDPOINTS) {
+    try {
+      const res = await fetch(endpoint);
+      if (!res.ok) {
+        continue;
+      }
+      const text = await res.text();
+      const words = text
+        .split(/\r?\n/)
+        .map((line) => line.trim().toLowerCase())
+        .filter((line) => /^[a-z]{3,12}$/.test(line));
+      if (words.length) {
+        wordPool = words;
+        return words;
+      }
+    } catch {
+      // try next endpoint
+    }
+  }
+  return [];
+}
+
+async function pickOnlineWordCard(): Promise<{
+  word: string;
+  phonetic: string;
+  definition: string;
+} | null> {
+  const pool = await ensureWordPool();
+  if (!pool.length) {
+    return null;
+  }
+
+  for (let i = 0; i < 16; i += 1) {
+    const word = pool[Math.floor(Math.random() * pool.length)];
+    try {
+      const res = await fetch(
+        `https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`
+      );
+      if (!res.ok) {
+        continue;
+      }
+      const data = (await res.json()) as Array<{
+        phonetic?: string;
+        phonetics?: Array<{ text?: string }>;
+        meanings?: Array<{ definitions?: Array<{ definition?: string }> }>;
+      }>;
+      const first = data?.[0];
+      const definition =
+        first?.meanings?.[0]?.definitions?.[0]?.definition?.trim() ||
+        first?.meanings?.find((m) => m.definitions?.[0]?.definition?.trim())?.definitions?.[0]?.definition?.trim() ||
+        "";
+      if (!definition) {
+        continue;
+      }
+      const phonetic =
+        first?.phonetic?.trim() ||
+        first?.phonetics?.find((item) => item.text?.trim())?.text?.trim() ||
+        "";
+      return { word, phonetic, definition };
+    } catch {
+      // pick another word
+    }
+  }
+
+  return null;
+}
+
+async function loadWordTrainingCard(): Promise<void> {
+  wordTrainingLoading.value = true;
+  wordTrainingFeedback.value = null;
+  wordTrainingInput.value = "";
+  try {
+    const card = await pickOnlineWordCard();
+    if (!card) {
+      ElMessage.error("在线单词数据暂不可用，请稍后重试");
+      wordTrainingWord.value = "";
+      wordTrainingDefinition.value = "";
+      wordTrainingPhonetic.value = "";
+      return;
+    }
+    wordTrainingWord.value = card.word;
+    wordTrainingDefinition.value = card.definition;
+    wordTrainingPhonetic.value = card.phonetic;
+  } finally {
+    wordTrainingLoading.value = false;
+  }
+}
+
 function handleStartDailyChallenge(): void {
   showingReview.value = false;
   reviewLoading.value = false;
@@ -297,6 +402,20 @@ function handleStartDailyChallenge(): void {
   feedbackText.value = "";
   reviewVersion += 1;
   store.startDailyChallenge();
+}
+
+async function handleSelectWordTraining(): Promise<void> {
+  if (isWordTrainingMode.value) {
+    return;
+  }
+  showingReview.value = false;
+  reviewLoading.value = false;
+  reviewTokens.value = [];
+  feedbackType.value = null;
+  feedbackText.value = "";
+  reviewVersion += 1;
+  store.setMode("word-training");
+  await loadWordTrainingCard();
 }
 
 function handleSelectChallenge(): void {
@@ -331,6 +450,25 @@ function handleAnswer(): void {
 }
 
 function handleSubmit(): void {
+  if (isWordTrainingMode.value) {
+    const answer = wordTrainingInput.value.trim().toLowerCase();
+    const expected = wordTrainingWord.value.trim().toLowerCase();
+    if (!expected) {
+      return;
+    }
+    wordTrainingStats.value.total += 1;
+    if (answer === expected) {
+      wordTrainingFeedback.value = "success";
+      wordTrainingStats.value.correct += 1;
+      ElMessage.success("回答正确");
+      void loadWordTrainingCard();
+    } else {
+      wordTrainingFeedback.value = "error";
+      ElMessage.error(`答案是：${wordTrainingWord.value}`);
+    }
+    return;
+  }
+
   if (!store.currentQuestion) {
     return;
   }
@@ -430,13 +568,15 @@ watch(
         :selected-course="store.selectedCourse"
         :mode="store.mode"
         :challenge-done="store.dailyChallengeDone"
+        :word-training-active="isWordTrainingMode"
         :total="store.total"
         @update:course="store.setCourse"
         @select-challenge="handleSelectChallenge"
+        @select-word-training="handleSelectWordTraining"
       />
 
       <div class="main-column">
-        <section class="top-progress ios-card">
+        <section v-if="!isWordTrainingMode" class="top-progress ios-card">
           <el-progress :percentage="store.progressPercent" :stroke-width="10" :show-text="false" />
           <div class="progress-meta">
             <span>进度 {{ store.progressText }}</span>
@@ -451,7 +591,42 @@ watch(
           </div>
         </section>
 
-        <section v-if="isChallengeMode && store.dailyChallengeDone" class="challenge-finished ios-card">
+        <section v-if="isWordTrainingMode" class="word-training-card ios-card">
+          <h3>单词训练</h3>
+          <p class="word-train-tip">根据释义写出对应英文单词（数据均来自在线词库和在线词典）</p>
+          <template v-if="wordTrainingLoading">
+            <p class="word-loading">正在加载在线单词...</p>
+          </template>
+          <template v-else-if="wordTrainingWord">
+            <div class="word-meta">
+              <span v-if="wordTrainingPhonetic">{{ wordTrainingPhonetic }}</span>
+            </div>
+            <p class="word-definition">{{ wordTrainingDefinition }}</p>
+            <el-input
+              v-model="wordTrainingInput"
+              placeholder="输入英文单词"
+              class="word-input"
+              @keyup.enter="handleSubmit"
+            />
+            <div class="word-actions">
+              <el-button round @click="loadWordTrainingCard">换一个</el-button>
+              <el-button round type="primary" @click="handleSubmit">提交</el-button>
+            </div>
+            <p class="word-stats">
+              正确率
+              {{
+                wordTrainingStats.total
+                  ? `${Math.round((wordTrainingStats.correct / wordTrainingStats.total) * 100)}%`
+                  : "0%"
+              }}
+              （{{ wordTrainingStats.correct }}/{{ wordTrainingStats.total }}）
+            </p>
+          </template>
+        </section>
+        <section
+          v-else-if="isChallengeMode && store.dailyChallengeDone"
+          class="challenge-finished ios-card"
+        >
           <h3>今日挑战完成</h3>
           <p>你已完成 5/5 题，继续保持！</p>
           <div class="challenge-stats">
@@ -620,6 +795,54 @@ watch(
   flex-direction: column;
 }
 
+.word-training-card {
+  padding: 22px;
+  text-align: center;
+}
+
+.word-train-tip {
+  margin: 0 0 14px;
+  color: #6f82ac;
+}
+
+.word-loading {
+  margin: 14px 0;
+  color: #6f82ac;
+}
+
+.word-meta {
+  margin-bottom: 10px;
+  color: #7a8eb5;
+  font-size: 14px;
+}
+
+.word-definition {
+  margin: 0 auto 14px;
+  max-width: 760px;
+  font-size: 22px;
+  line-height: 1.45;
+  color: #2d3d62;
+  font-weight: 700;
+}
+
+.word-input {
+  margin: 0 auto;
+  max-width: 420px;
+}
+
+.word-actions {
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.word-stats {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #6e81ac;
+}
+
 .challenge-finished {
   padding: 24px;
   text-align: center;
@@ -697,6 +920,10 @@ watch(
 
   .progress-meta {
     gap: 8px 14px;
+  }
+
+  .word-definition {
+    font-size: 18px;
   }
 
 }

@@ -6,12 +6,14 @@ defineProps<{
   selectedCourse: CourseOption["key"];
   mode: PracticeMode;
   challengeDone: boolean;
+  wordTrainingActive: boolean;
   total: number;
 }>();
 
 const emit = defineEmits<{
   (event: "update:course", value: CourseOption["key"]): void;
   (event: "select-challenge"): void;
+  (event: "select-word-training"): void;
 }>();
 </script>
 
@@ -31,6 +33,17 @@ const emit = defineEmits<{
       <span class="text-wrap">
         <span class="title">每日小挑战</span>
         <span class="subtitle">{{ challengeDone ? "今日已完成" : "难度 1 -> 5" }}</span>
+      </span>
+    </button>
+    <button
+      class="topic-card word-tab"
+      :class="{ active: wordTrainingActive }"
+      @click="emit('select-word-training')"
+    >
+      <span class="icon">📘</span>
+      <span class="text-wrap">
+        <span class="title">单词训练</span>
+        <span class="subtitle">在线词库 + 在线释义</span>
       </span>
     </button>
 
@@ -160,6 +173,31 @@ const emit = defineEmits<{
   border-color: #f0ad4e;
   background: linear-gradient(180deg, #fff8ea 0%, #ffefca 100%);
   box-shadow: 0 10px 24px rgba(238, 165, 66, 0.2);
+}
+
+.word-tab {
+  margin-bottom: 12px;
+  border-color: #cfe7ff;
+  background: linear-gradient(180deg, #f7fbff 0%, #eaf4ff 100%);
+
+  .icon {
+    background: #eaf4ff;
+  }
+
+  .subtitle {
+    color: #356fb0;
+  }
+
+  &:hover {
+    border-color: #abd3ff;
+    box-shadow: 0 10px 24px rgba(80, 152, 234, 0.16);
+  }
+}
+
+.word-tab.active {
+  border-color: #5ea8ff;
+  background: linear-gradient(180deg, #eef7ff 0%, #deefff 100%);
+  box-shadow: 0 10px 24px rgba(80, 152, 234, 0.2);
 }
 
 @media (max-width: 1060px) {
