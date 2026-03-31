@@ -1,0 +1,283 @@
+{
+  "source": "https://julebu.co/learn",
+  "fetchedAt": "2026-03-31",
+  "overview": {
+    "title": "英语学习中心",
+    "type": "英语词汇",
+    "wordCountHint": "1022+",
+    "allVocabularyUrl": "https://julebu.co/learn/vocabulary",
+    "comingSoon": ["英语语法", "常用句型", "考试备考"]
+  },
+  "resources": [
+    {
+      "slug": "food",
+      "title": "食物英语单词学习",
+      "url": "https://julebu.co/learn/vocabulary/food",
+      "wordCount": 52,
+      "groupCount": 5,
+      "description": "52个常见食物英语单词，按主食、肉类海鲜、蔬菜、调料、甜点零食分组。",
+      "groups": [
+        {
+          "nameCn": "主食与谷物",
+          "nameEn": "Staples & Grains",
+          "wordCount": 10,
+          "learnUrl": "https://julebu.co/learn/vocabulary/food/staples-and-grains",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/food/staples-and-grains"
+        },
+        {
+          "nameCn": "肉类与海鲜",
+          "nameEn": "Meat & Seafood",
+          "wordCount": 12,
+          "learnUrl": "https://julebu.co/learn/vocabulary/food/meat-and-seafood",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/food/meat-and-seafood"
+        },
+        {
+          "nameCn": "蔬菜",
+          "nameEn": "Vegetables",
+          "wordCount": 12,
+          "learnUrl": "https://julebu.co/learn/vocabulary/food/vegetables",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/food/vegetables"
+        },
+        {
+          "nameCn": "调料与酱料",
+          "nameEn": "Seasonings & Sauces",
+          "wordCount": 8,
+          "learnUrl": "https://julebu.co/learn/vocabulary/food/seasonings-and-sauces",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/food/seasonings-and-sauces"
+        },
+        {
+          "nameCn": "甜点与零食",
+          "nameEn": "Desserts & Snacks",
+          "wordCount": 10,
+          "learnUrl": "https://julebu.co/learn/vocabulary/food/desserts-and-snacks",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/food/desserts-and-snacks"
+        }
+      ]
+    },
+    {
+      "slug": "animals",
+      "title": "动物英语单词学习",
+      "url": "https://julebu.co/learn/vocabulary/animals",
+      "wordCount": 50,
+      "groupCount": 5,
+      "description": "50个常见动物英语单词，按家畜宠物、野生动物、海洋动物、鸟类、昆虫分组。",
+      "groups": [
+        {
+          "nameCn": "家畜与宠物",
+          "nameEn": "Pets & Farm Animals",
+          "wordCount": 12,
+          "learnUrl": "https://julebu.co/learn/vocabulary/animals/pets-and-farm-animals",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/animals/pets-and-farm-animals"
+        },
+        {
+          "nameCn": "野生动物",
+          "nameEn": "Wild Animals",
+          "wordCount": 12,
+          "learnUrl": "https://julebu.co/learn/vocabulary/animals/wild-animals",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/animals/wild-animals"
+        },
+        {
+          "nameCn": "海洋动物",
+          "nameEn": "Sea Animals",
+          "wordCount": 10,
+          "learnUrl": "https://julebu.co/learn/vocabulary/animals/sea-animals",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/animals/sea-animals"
+        },
+        {
+          "nameCn": "鸟类",
+          "nameEn": "Birds",
+          "wordCount": 8,
+          "learnUrl": "https://julebu.co/learn/vocabulary/animals/birds",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/animals/birds"
+        },
+        {
+          "nameCn": "昆虫",
+          "nameEn": "Insects",
+          "wordCount": 8,
+          "learnUrl": "https://julebu.co/learn/vocabulary/animals/insects",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/animals/insects"
+        }
+      ]
+    },
+    {
+      "slug": "body",
+      "title": "身体部位英语单词学习",
+      "url": "https://julebu.co/learn/vocabulary/body",
+      "wordCount": 43,
+      "groupCount": 5,
+      "description": "43个常见身体部位英语单词，按头部五官、上半身、下半身、手脚细节、内部器官分组。",
+      "groups": [
+        {
+          "nameCn": "头部与五官",
+          "nameEn": "Head & Face",
+          "wordCount": 12,
+          "learnUrl": "https://julebu.co/learn/vocabulary/body/head-and-face",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/body/head-and-face"
+        },
+        {
+          "nameCn": "上半身",
+          "nameEn": "Upper Body",
+          "wordCount": 10,
+          "learnUrl": "https://julebu.co/learn/vocabulary/body/upper-body",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/body/upper-body"
+        },
+        {
+          "nameCn": "下半身",
+          "nameEn": "Lower Body",
+          "wordCount": 10,
+          "learnUrl": "https://julebu.co/learn/vocabulary/body/lower-body",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/body/lower-body"
+        },
+        {
+          "nameCn": "手和脚细节",
+          "nameEn": "Hands & Feet Details",
+          "wordCount": 5,
+          "learnUrl": "https://julebu.co/learn/vocabulary/body/hands-and-feet-details",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/body/hands-and-feet-details"
+        },
+        {
+          "nameCn": "内部器官",
+          "nameEn": "Internal Organs",
+          "wordCount": 6,
+          "learnUrl": "https://julebu.co/learn/vocabulary/body/internal-organs",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/body/internal-organs"
+        }
+      ]
+    },
+    {
+      "slug": "school",
+      "title": "学校英语单词学习",
+      "url": "https://julebu.co/learn/vocabulary/school",
+      "wordCount": 38,
+      "groupCount": 5,
+      "description": "38个常见学校英语单词，按学校场所、学习用品、学科、学校人员、考试相关分组。",
+      "groups": [
+        {
+          "nameCn": "学校场所",
+          "nameEn": "School Places",
+          "wordCount": 8,
+          "learnUrl": "https://julebu.co/learn/vocabulary/school/school-places",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/school/school-places"
+        },
+        {
+          "nameCn": "学习用品",
+          "nameEn": "School Supplies",
+          "wordCount": 8,
+          "learnUrl": "https://julebu.co/learn/vocabulary/school/school-supplies",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/school/school-supplies"
+        },
+        {
+          "nameCn": "学科名称",
+          "nameEn": "School Subjects",
+          "wordCount": 7,
+          "learnUrl": "https://julebu.co/learn/vocabulary/school/school-subjects",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/school/school-subjects"
+        },
+        {
+          "nameCn": "学校人员",
+          "nameEn": "School People",
+          "wordCount": 7,
+          "learnUrl": "https://julebu.co/learn/vocabulary/school/school-people",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/school/school-people"
+        },
+        {
+          "nameCn": "考试相关",
+          "nameEn": "Exams & Grades",
+          "wordCount": 8,
+          "learnUrl": "https://julebu.co/learn/vocabulary/school/exams-and-grades",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/school/exams-and-grades"
+        }
+      ]
+    },
+    {
+      "slug": "numbers",
+      "title": "数字英语单词学习",
+      "url": "https://julebu.co/learn/vocabulary/numbers",
+      "wordCount": 38,
+      "groupCount": 5,
+      "description": "38个常见数字英语单词，按基数词、十几/整十、大数、序数词、数学术语分组。",
+      "groups": [
+        {
+          "nameCn": "基数词1-10",
+          "nameEn": "Basic Numbers 1-10",
+          "wordCount": 10,
+          "learnUrl": "https://julebu.co/learn/vocabulary/numbers/basic-numbers",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/numbers/basic-numbers"
+        },
+        {
+          "nameCn": "十几和整十",
+          "nameEn": "Teens & Tens",
+          "wordCount": 8,
+          "learnUrl": "https://julebu.co/learn/vocabulary/numbers/teens-and-tens",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/numbers/teens-and-tens"
+        },
+        {
+          "nameCn": "大数",
+          "nameEn": "Large Numbers",
+          "wordCount": 5,
+          "learnUrl": "https://julebu.co/learn/vocabulary/numbers/large-numbers",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/numbers/large-numbers"
+        },
+        {
+          "nameCn": "序数词",
+          "nameEn": "Ordinal Numbers",
+          "wordCount": 5,
+          "learnUrl": "https://julebu.co/learn/vocabulary/numbers/ordinal-numbers",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/numbers/ordinal-numbers"
+        },
+        {
+          "nameCn": "数学相关",
+          "nameEn": "Math Terms",
+          "wordCount": 10,
+          "learnUrl": "https://julebu.co/learn/vocabulary/numbers/math-terms",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/numbers/math-terms"
+        }
+      ]
+    },
+    {
+      "slug": "fruits",
+      "title": "水果英语单词学习",
+      "url": "https://julebu.co/learn/vocabulary/fruits",
+      "wordCount": 38,
+      "groupCount": 5,
+      "description": "38个常见水果英语单词，按常见水果、热带水果、浆果、柑橘、瓜类及其他分组。",
+      "groups": [
+        {
+          "nameCn": "常见水果",
+          "nameEn": "Common Fruits",
+          "wordCount": 12,
+          "learnUrl": "https://julebu.co/learn/vocabulary/fruits/common-fruits",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/fruits/common-fruits"
+        },
+        {
+          "nameCn": "热带水果",
+          "nameEn": "Tropical Fruits",
+          "wordCount": 10,
+          "learnUrl": "https://julebu.co/learn/vocabulary/fruits/tropical-fruits",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/fruits/tropical-fruits"
+        },
+        {
+          "nameCn": "浆果类",
+          "nameEn": "Berries",
+          "wordCount": 6,
+          "learnUrl": "https://julebu.co/learn/vocabulary/fruits/berries",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/fruits/berries"
+        },
+        {
+          "nameCn": "柑橘类",
+          "nameEn": "Citrus Fruits",
+          "wordCount": 5,
+          "learnUrl": "https://julebu.co/learn/vocabulary/fruits/citrus-fruits",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/fruits/citrus-fruits"
+        },
+        {
+          "nameCn": "瓜类及其他",
+          "nameEn": "Melons & Others",
+          "wordCount": 5,
+          "learnUrl": "https://julebu.co/learn/vocabulary/fruits/melons-and-others",
+          "practiceUrl": "https://julebu.co/practice/vocabulary/fruits/melons-and-others"
+        }
+      ]
+    }
+  ]
+}
