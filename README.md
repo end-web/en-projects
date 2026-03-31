@@ -1,30 +1,50 @@
 # Vue3 英语练习站
 
-一个基于 Vue3 + Element Plus 的英语填空练习站，支持：
+一个基于 Vue 3 + Vite + TypeScript + Element Plus 的英语填空练习站。
 
-- 左侧课程/难度选择（1-10）
-- 中间中文题干 + 英文逐字填空
-- 底部朗读、答案、提交
-- 提交正确后自动进入下一题
+## 功能特性
+
+- 课程和难度双维度选择（1-10）
+- 中文题干 + 英文逐词填空
+- 朗读、显示答案、提交判题
+- 答对后自动进入下一题
 - iOS 风格界面
 
-## 1. 安装与启动
+## 技术栈
+
+- Vue 3
+- Vite
+- TypeScript
+- Pinia
+- Vue Router
+- Element Plus
+
+## 本地开发
 
 ```bash
 npm install
 npm run dev
 ```
 
-## 2. 目录说明
+默认开发地址由 Vite 输出（通常为 `http://localhost:5173`）。
+
+## 构建与预览
+
+```bash
+npm run build
+npm run preview
+```
+
+## 项目结构
 
 - `src/views/PracticeView.vue`：主页面与业务编排
 - `src/components/CourseSidebar.vue`：课程与难度选择
 - `src/components/AnswerPanel.vue`：题目与填空区域
 - `src/components/BottomActions.vue`：底部操作按钮
-- `src/stores/practice.ts`：核心状态与提交逻辑
+- `src/stores/practice.ts`：核心状态与提交流程
 - `src/data/questions.ts`：本地题库
 
-## 3. 怎么扩展题库
+## 扩展题库
 
 在 `src/data/questions.ts` 的 `templateByDifficulty` 中追加中英句子即可：
 
@@ -35,23 +55,16 @@ npm run dev
 }
 ```
 
-系统会自动按课程 1-10 与难度 1-10 生成题目。
+系统会按课程与难度自动生成练习题。
 
-## 4. 朗读功能说明
+## 朗读说明
 
-当前使用浏览器 Web Speech API：
+项目使用浏览器 Web Speech API：
 
-- 调用 `speechSynthesis.speak()` 读英文答案
-- 若系统无英语语音包，会给出提示
-- 可在 `PracticeView.vue` 调整 `rate/pitch/lang`
+- 通过 `speechSynthesis.speak()` 朗读英文句子
+- 若系统缺少英语语音包，会出现提示
+- 可在 `PracticeView.vue` 调整 `rate`、`pitch`、`lang`
 
-## 5. 常见问题
+## 仓库地址
 
-1. **点击朗读没有声音**  
-   请检查系统音量、浏览器权限，以及是否安装英语语音包。
-
-2. **题目太少**  
-   直接在 `templateByDifficulty` 每个难度添加更多句子。
-
-3. **想接后端题库**  
-   将 `questions` 改为 API 拉取并映射为 `Question` 类型即可。
+- GitHub: [https://github.com/end-web/en-projects.git](https://github.com/end-web/en-projects.git)
