@@ -35,6 +35,22 @@ npm run build
 npm run preview
 ```
 
+## 部署到 GitHub Pages
+
+本仓库已包含 GitHub Actions 工作流：
+
+- `CI`：每次 push/PR 自动安装依赖并构建校验
+- `Deploy Pages`：推送到 `main` 后自动构建并发布静态站
+
+首次启用时，请在仓库设置中确认：
+
+- `Settings` -> `Pages` -> `Build and deployment`
+- `Source` 选择 `GitHub Actions`
+
+部署成功后，站点地址通常为：
+
+- `https://end-web.github.io/en-projects/`
+
 ## 项目结构
 
 - `src/views/PracticeView.vue`：主页面与业务编排
