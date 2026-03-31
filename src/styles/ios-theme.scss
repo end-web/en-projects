@@ -18,6 +18,9 @@ body {
   background: radial-gradient(circle at 0% 0%, #dff0ff 0%, transparent 35%),
     radial-gradient(circle at 100% 100%, #f1e5ff 0%, transparent 30%),
     linear-gradient(145deg, var(--ios-bg-start) 0%, var(--ios-bg-end) 100%);
+  background-repeat: no-repeat, no-repeat, no-repeat;
+  background-size: 100% 100%, 100% 100%, 100% 100%;
+  background-attachment: fixed, fixed, fixed;
   min-height: 100vh;
 }
 

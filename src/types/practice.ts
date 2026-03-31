@@ -32,3 +32,7 @@ export interface ReviewToken {
   posLabel: string;
   gloss: string;
 }
+
+export type PracticeDataSource = "remote" | "unavailable";
+
+export type PracticeMode = "normal" | "daily-challenge";

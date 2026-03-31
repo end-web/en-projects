@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import type { CourseOption } from "../types/practice";
+import type { CourseOption, PracticeMode } from "../types/practice";
 
 defineProps<{
   courseOptions: CourseOption[];
   selectedCourse: CourseOption["key"];
+  mode: PracticeMode;
+  challengeDone: boolean;
   total: number;
 }>();
 
 const emit = defineEmits<{
   (event: "update:course", value: CourseOption["key"]): void;
+  (event: "select-challenge"): void;
 }>();
 </script>
 
@@ -19,7 +22,19 @@ const emit = defineEmits<{
       <span>{{ total }} 题</span>
     </div>
 
-    <el-divider content-position="left">课程</el-divider>
+    <button
+      class="topic-card challenge-tab"
+      :class="{ active: mode === 'daily-challenge' }"
+      @click="emit('select-challenge')"
+    >
+      <span class="icon">🚀</span>
+      <span class="text-wrap">
+        <span class="title">每日小挑战</span>
+        <span class="subtitle">{{ challengeDone ? "今日已完成" : "难度 1 -> 5" }}</span>
+      </span>
+    </button>
+
+    <el-divider content-position="left">基础</el-divider>
     <div class="chip-group">
       <button
         v-for="item in courseOptions"
@@ -48,6 +63,7 @@ const emit = defineEmits<{
   display: flex;
   justify-content: space-between;
   align-items: baseline;
+  margin-bottom: 16px;
 
   h3 {
     margin: 0;
@@ -68,6 +84,7 @@ const emit = defineEmits<{
 }
 
 .topic-card {
+  width: 100%;
   border: 1px solid #dfe6ff;
   background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
   color: #304169;
@@ -118,6 +135,31 @@ const emit = defineEmits<{
   border-color: #7ea0ff;
   background: linear-gradient(180deg, #f8fbff 0%, #eef4ff 100%);
   box-shadow: 0 10px 24px rgba(73, 108, 255, 0.16);
+}
+
+.challenge-tab {
+  margin-bottom: 14px;
+  border-color: #ffd9a8;
+  background: linear-gradient(180deg, #fffaf0 0%, #fff3dd 100%);
+
+  .icon {
+    background: #fff2da;
+  }
+
+  .subtitle {
+    color: #b8741c;
+  }
+
+  &:hover {
+    border-color: #ffc980;
+    box-shadow: 0 10px 24px rgba(238, 165, 66, 0.16);
+  }
+}
+
+.challenge-tab.active {
+  border-color: #f0ad4e;
+  background: linear-gradient(180deg, #fff8ea 0%, #ffefca 100%);
+  box-shadow: 0 10px 24px rgba(238, 165, 66, 0.2);
 }
 
 @media (max-width: 1060px) {

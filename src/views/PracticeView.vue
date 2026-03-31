@@ -11,6 +11,7 @@ import { ipaDictionary } from "../data/ipaDictionary";
 const store = usePracticeStore();
 
 const disabledAction = computed(() => !store.currentQuestion);
+const isChallengeMode = computed(() => store.mode === "daily-challenge");
 const expectedWords = computed(() =>
   store.currentQuestion?.en.replace(/[.,!?;:]+$/g, "").split(/\s+/).filter(Boolean) ?? []
 );
@@ -189,19 +190,45 @@ async function loadDailySentence(forceSwitch = false): Promise<void> {
   dailyLoading.value = true;
   const previous = dailySentence.value.en;
   try {
-    const res = await fetch(`https://open.iciba.com/dsapi/?t=${Date.now()}`);
-    if (!res.ok) {
-      throw new Error("daily-api-failed");
+    const providers = [
+      `https://dummyjson.com/quotes/random?t=${Date.now()}`,
+      `https://zenquotes.io/api/random?t=${Date.now()}`
+    ];
+
+    let en = "";
+    let zh = "";
+
+    for (const url of providers) {
+      try {
+        const res = await fetch(url);
+        if (!res.ok) {
+          continue;
+        }
+        const data = (await res.json()) as
+          | { quote?: string; author?: string }
+          | Array<{ q?: string; a?: string }>;
+
+        if ("quote" in (data as { quote?: string })) {
+          const item = data as { quote?: string; author?: string };
+          en = item.quote?.trim() ?? "";
+          const author = item.author?.trim() ?? "";
+          zh = author ? `作者：${author}` : "每日一句";
+        } else if (Array.isArray(data)) {
+          const item = data[0];
+          en = item?.q?.trim() ?? "";
+          const author = item?.a?.trim() ?? "";
+          zh = author ? `作者：${author}` : "每日一句";
+        }
+
+        if (en) {
+          break;
+        }
+      } catch {
+        // try next provider
+      }
     }
-    const data = (await res.json()) as {
-      content?: string;
-      note?: string;
-      tts?: string;
-      mp3?: string;
-    };
-    const en = data.content?.trim() ?? "";
-    const zh = data.note?.trim() ?? "";
-    const audio = data.tts?.trim() || data.mp3?.trim() || "";
+
+    const audio = "";
 
     if (!en) {
       throw new Error("daily-empty");
@@ -212,7 +239,7 @@ async function loadDailySentence(forceSwitch = false): Promise<void> {
     } else {
       dailySentence.value = {
         en,
-        zh: zh || "暂无翻译",
+        zh,
         audio
       };
     }
@@ -260,6 +287,43 @@ function handleRead(): void {
   utter.lang = "en-US";
   utter.rate = 0.95;
   utter.pitch = 1;
+}
+
+function handleStartDailyChallenge(): void {
+  showingReview.value = false;
+  reviewLoading.value = false;
+  reviewTokens.value = [];
+  feedbackType.value = null;
+  feedbackText.value = "";
+  reviewVersion += 1;
+  store.startDailyChallenge();
+}
+
+function handleSelectChallenge(): void {
+  if (isChallengeMode.value) {
+    return;
+  }
+  handleStartDailyChallenge();
+}
+
+function handleExitDailyChallenge(): void {
+  showingReview.value = false;
+  reviewLoading.value = false;
+  reviewTokens.value = [];
+  feedbackType.value = null;
+  feedbackText.value = "";
+  reviewVersion += 1;
+  store.exitDailyChallenge();
+}
+
+function handleResetDailyChallenge(): void {
+  showingReview.value = false;
+  reviewLoading.value = false;
+  reviewTokens.value = [];
+  feedbackType.value = null;
+  feedbackText.value = "";
+  reviewVersion += 1;
+  store.resetDailyChallenge();
 }
 
 function handleAnswer(): void {
@@ -310,6 +374,7 @@ function onWindowKeydown(event: KeyboardEvent): void {
 
 onMounted(() => {
   window.addEventListener("keydown", onWindowKeydown);
+  void store.initQuestions();
   void loadDailySentence();
 });
 
@@ -319,6 +384,18 @@ onBeforeUnmount(() => {
 
 watch(
   () => store.selectedCourse,
+  () => {
+    showingReview.value = false;
+    reviewLoading.value = false;
+    reviewTokens.value = [];
+    feedbackType.value = null;
+    feedbackText.value = "";
+    reviewVersion += 1;
+  }
+);
+
+watch(
+  () => store.mode,
   () => {
     showingReview.value = false;
     reviewLoading.value = false;
@@ -351,8 +428,11 @@ watch(
       <CourseSidebar
         :course-options="store.courseOptions"
         :selected-course="store.selectedCourse"
+        :mode="store.mode"
+        :challenge-done="store.dailyChallengeDone"
         :total="store.total"
         @update:course="store.setCourse"
+        @select-challenge="handleSelectChallenge"
       />
 
       <div class="main-column">
@@ -360,33 +440,52 @@ watch(
           <el-progress :percentage="store.progressPercent" :stroke-width="10" :show-text="false" />
           <div class="progress-meta">
             <span>进度 {{ store.progressText }}</span>
+            <span v-if="isChallengeMode">模式 每日挑战</span>
             <span>正确率 {{ store.accuracy }}</span>
             <span>连对 {{ store.streak }}</span>
             <span>积分 {{ store.score }}</span>
+            <span v-if="isChallengeMode" class="challenge-inline-actions">
+              <el-button text size="small" @click="handleResetDailyChallenge">重开</el-button>
+              <el-button text size="small" @click="handleExitDailyChallenge">退出</el-button>
+            </span>
           </div>
         </section>
 
-        <AnswerPanel
-          :question="store.currentQuestion"
-          :draft-words="store.draftWords"
-          :expected-words="expectedWords"
-          :show-answer="store.showAnswer"
-          :progress-text="store.progressText"
-          :accuracy="store.accuracy"
-          :feedback-type="feedbackType"
-          :feedback-text="feedbackText"
-          :showing-review="showingReview"
-          :review-loading="reviewLoading"
-          :review-tokens="reviewTokens"
-          @update-word="store.updateWord"
-          @submit-request="handleSubmit"
-        />
-        <BottomActions
-          :disabled="disabledAction"
-          @read="handleRead"
-          @answer="handleAnswer"
-          @submit="handleSubmit"
-        />
+        <section v-if="isChallengeMode && store.dailyChallengeDone" class="challenge-finished ios-card">
+          <h3>今日挑战完成</h3>
+          <p>你已完成 5/5 题，继续保持！</p>
+          <div class="challenge-stats">
+            <span>正确率 {{ store.accuracy }}</span>
+            <span>得分 {{ store.score }}</span>
+          </div>
+          <div class="challenge-finish-actions">
+            <el-button round @click="handleResetDailyChallenge">再练一次</el-button>
+            <el-button round type="primary" @click="handleExitDailyChallenge">返回普通练习</el-button>
+          </div>
+        </section>
+        <template v-else>
+          <AnswerPanel
+            :question="store.currentQuestion"
+            :draft-words="store.draftWords"
+            :expected-words="expectedWords"
+            :show-answer="store.showAnswer"
+            :progress-text="store.progressText"
+            :accuracy="store.accuracy"
+            :feedback-type="feedbackType"
+            :feedback-text="feedbackText"
+            :showing-review="showingReview"
+            :review-loading="reviewLoading"
+            :review-tokens="reviewTokens"
+            @update-word="store.updateWord"
+            @submit-request="handleSubmit"
+          />
+          <BottomActions
+            :disabled="disabledAction"
+            @read="handleRead"
+            @answer="handleAnswer"
+            @submit="handleSubmit"
+          />
+        </template>
       </div>
     </div>
   </main>
@@ -395,10 +494,10 @@ watch(
 <style scoped lang="scss">
 .practice-page {
   min-height: 100vh;
-  padding: 24px;
-  padding-bottom: 34px;
-  max-width: 1240px;
-  margin: 0 auto;
+  width: 100%;
+  max-width: none;
+  padding: clamp(20px, 2.2vw, 34px);
+  padding-bottom: clamp(24px, 2.5vw, 44px);
 }
 
 .page-header {
@@ -442,49 +541,57 @@ watch(
 
 .daily-inline {
   margin: 0;
-  max-width: 640px;
-  padding: 10px 14px;
-  border-radius: 14px;
-  background: rgba(233, 241, 255, 0.9);
+  max-width: 880px;
+  padding: 0;
   color: #39538f;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  gap: 8px 10px;
   cursor: pointer;
   user-select: none;
-  border: 1px solid #d6e3ff;
   text-align: center;
 }
 
 .daily-target {
   justify-self: center;
-  width: min(440px, 100%);
+  width: min(760px, 100%);
 }
 
 .daily-en-inline {
-  font-size: 15px;
+  font-size: clamp(16px, 2vw, 24px);
   font-weight: 600;
-  width: 100%;
   background: linear-gradient(90deg, #9a66ff 0%, #e06dcb 55%, #b67cff 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .daily-zh-inline {
-  font-size: 13px;
+  font-size: clamp(14px, 1.8vw, 20px);
   background: linear-gradient(90deg, #a874ff 0%, #ee88d4 55%, #c28cff 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.daily-zh-inline::before {
+  content: "—";
+  margin-right: 8px;
 }
 
 .content-grid {
   display: grid;
-  grid-template-columns: 290px minmax(0, 1fr);
-  gap: 18px;
+  grid-template-columns: minmax(290px, 22vw) minmax(0, 1fr);
+  gap: clamp(16px, 1.4vw, 24px);
 }
 
 .top-progress {
@@ -495,10 +602,17 @@ watch(
 .progress-meta {
   margin-top: 8px;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   gap: 10px;
   font-size: 12px;
   color: #7a8fbf;
+}
+
+.challenge-inline-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
 }
 
 .main-column {
@@ -506,10 +620,41 @@ watch(
   flex-direction: column;
 }
 
+.challenge-finished {
+  padding: 24px;
+  text-align: center;
+
+  h3 {
+    margin: 0 0 10px;
+    color: #2a3d65;
+  }
+
+  p {
+    margin: 0;
+    color: #6880b3;
+  }
+}
+
+.challenge-stats {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  color: #5c729f;
+  font-size: 14px;
+}
+
+.challenge-finish-actions {
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
 @media (max-width: 1060px) {
   .practice-page {
-    padding: 14px;
-    padding-bottom: 92px;
+    padding: 12px;
+    padding-bottom: 90px;
   }
 
   .page-header {
@@ -530,15 +675,29 @@ watch(
 
   .daily-inline {
     max-width: 100%;
+    justify-content: flex-start;
+    text-align: left;
+    align-items: flex-start;
   }
 
   .daily-target {
-    width: 100%;
+    display: none;
   }
 
   .content-grid {
     grid-template-columns: 1fr;
     gap: 12px;
   }
+
+  .daily-en-inline,
+  .daily-zh-inline {
+    font-size: 15px;
+    line-height: 1.45;
+  }
+
+  .progress-meta {
+    gap: 8px 14px;
+  }
+
 }
 </style>
